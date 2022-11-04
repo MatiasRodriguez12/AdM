@@ -24,15 +24,56 @@ Cortex M3/M4: Mayor performance, agregan funcionalidades para procesamiento digi
               Cortex M4 puede llevar a cabo algunas aplicaciones de procesamientos de señales digitales que tradicionalmente han sido realizados por un DSP por separado.
 -------------------------------------------------------------------------------------------------------------
 2. ¿Por qué se dice que el set de instrucciones Thumb permite mayor densidad de código? Explique
+
+El Thumb ISA es un conjunto de instrucciones de 16 bits que proporciona una excelente densidad de código. 
+Esto significa que para lograr las mismas tareas, se necesita un tamaño de programa más pequeño. 
+Como resultado, puede reducir el costo y el consumo de energía al usar un microcontrolador con un tamaño de memoria flash más pequeño,
+y los fabricantes de chips pueden producir chips de microcontroladores con paquetes más pequeños.
+La tecnología Thumb-2 permite que las instrucciones de 16 bits y las instrucciones de 32 bits funcionen juntas sin sobrecarga de cambio de estado. 
+La mayoría de las operaciones simples se pueden realizar con una instrucción de 16 bits
 -------------------------------------------------------------------------------------------------------------
 3. ¿Qué entiende por arquitectura load-store? ¿Qué tipo de instrucciones no posee este tipo de arquitectura?
+
+Los procesadores Cortex-M se basan en una arquitectura load-store. 
+Esto significa que  pera poder realizar operaciones con datos, estos deben cargarse en registros desde la memoria, 
+procesarse y luego volver a escribirse en la memoria utilizando una serie de instrucciones separadas.
 -------------------------------------------------------------------------------------------------------------
 4. ¿Cómo es el mapa de memoria de la familia?
+
+El mapa de memoria de la familia consta de un maximo de 4gb de espacio. Para ello cuenta con 32 bits de direccionamiento.
+Este espacio se divide en varias regiones de memoria. La partición se basa en usos típicos, por lo que las diferentes áreas están diseñadas para usarse principalmente para:
+
+• Accesos de código de programa .
+• Accesos a datos (región SRAM por ejemplo).
+• Periféricos.
+• Componentes de depuración y control interno del procesador.
 -------------------------------------------------------------------------------------------------------------
 5. ¿Qué ventajas presenta el uso de los “shadowed pointers” del PSP y el MSP?
 -------------------------------------------------------------------------------------------------------------
 6. Describa los diferentes modos de privilegio y operación del Cortex M, sus relaciones y como se conmuta de uno al otro. 
 Describa un ejemplo en el que se pasa del modo privilegiado a no priviligiado y nuevamente a privilegiado.
+
+Los procesadores Cortex-M3 y Cortex-M4 tienen dos estados de operación y dos modos. 
+Además, los procesadores pueden tener niveles de acceso privilegiado y no privilegiado
+El nivel de acceso privilegiado puede acceder a todos los recursos del procesador, 
+mientras que el nivel de acceso no privilegiado significa que algunas regiones de la memoria son inaccesibles y no se pueden usar algunas operaciones.
+
+Estados de operación:
+
+Debug state: cuando el procesador se detiene (por ejemplo, por el depurador o después de llegar a un punto de interrupción), 
+             ingresa al estado de depuración y deja de ejecutar instrucciones.
+
+Thumb state: si el procesador ejecuta código de programa, se encuentra en Thumb state.
+
+Modos de opreación:
+
+Modo handler: Al ejecutar un controlador de excepciones, como una rutina de servicio de interrupción (ISR). 
+              Cuando está en Modo handler, el procesador siempre tiene un nivel de acceso privilegiado.
+
+Thread mode: Al ejecutar código de aplicación normal, el procesador puede ser ya sea en nivel de acceso privilegiado o nivel de acceso no privilegiado.
+
+El software puede cambiar el procesador en modo privilegiado a modo no privilegiado. Sin embargo, no puede cambiar de no privilegiado a privilegiado. 
+Si esto es necesario, el procesador tiene que usar el mecanismo de excepción para manejar el cambio.
 -------------------------------------------------------------------------------------------------------------
 7. ¿Qué se entiende por modelo de registros ortogonal? Dé un ejemplo
 -------------------------------------------------------------------------------------------------------------
