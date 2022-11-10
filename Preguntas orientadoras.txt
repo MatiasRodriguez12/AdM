@@ -49,6 +49,19 @@ Este espacio se divide en varias regiones de memoria. La partición se basa en u
 • Componentes de depuración y control interno del procesador.
 -------------------------------------------------------------------------------------------------------------
 5. ¿Qué ventajas presenta el uso de los “shadowed pointers” del PSP y el MSP?
+
+Existen dos Stack Pointer disponibles:
+
+MSP: Es el SP por default. Utilizado para el kernel del sistema operativo y el handler de interrupciones.
+PSP: Utilizado para las tareas de aplicación.
+
+En sistemas con un sistema operatibo integrado o RTOS, el handler de excepciones usan MSP, mientras que las tareas de aplicación
+usan PSP.
+Cada tarea tiene su propio espacio de memoria en la pila, haciendo que el codigo de cambio de contexto actualice el valor del PSP cada vez
+en que el contexto es cambiado.
+
+Si una tarea se encontrase con un problema que conduzca al daño (corrupción) de la pila, es probable que el área de pila utilizada por el kernel del SO y otras tareas
+permanezca intacto, mejorando la confiabilidad del sistema.
 -------------------------------------------------------------------------------------------------------------
 6. Describa los diferentes modos de privilegio y operación del Cortex M, sus relaciones y como se conmuta de uno al otro. 
 Describa un ejemplo en el que se pasa del modo privilegiado a no priviligiado y nuevamente a privilegiado.
@@ -76,12 +89,25 @@ El software puede cambiar el procesador en modo privilegiado a modo no privilegi
 Si esto es necesario, el procesador tiene que usar el mecanismo de excepción para manejar el cambio.
 -------------------------------------------------------------------------------------------------------------
 7. ¿Qué se entiende por modelo de registros ortogonal? Dé un ejemplo
+Se refiere a que los registros pueden almacenar cualquier tipos de datos, ya sean valores de variables, instrucciones, punteros, etc.
 -------------------------------------------------------------------------------------------------------------
 8. ¿Qué ventajas presenta el uso de intrucciones de ejecución condicional (IT)? Dé un ejemplo
 -------------------------------------------------------------------------------------------------------------
 9. Describa brevemente las excepciones más prioritarias (reset, NMI, Hardfault).
 -------------------------------------------------------------------------------------------------------------
 10. Describa las funciones principales de la pila. ¿Cómo resuelve la arquitectura el llamado a funciones y su retorno?
+
+La pila (stack) es es un tipo de mecanismo de uso de memoria que permite que una parte de la memoria se use como búfer 
+de almacenamiento de datos de tipo LIFO (ultima en entrar, primera en salir).
+Los procesadores usan la instrucción PUSH para almacenar datos en la pila, y la instrucción POP para recuperarlos.
+
+Entre las principales funciones de la pila se encuentran:
+• Almacenamiento temporal de datos originales cuando una función que se está ejecutando necesita utilizar 
+	registros (en el banco de registros) para el procesamiento de datos. Los valores se pueden restaurar 
+	al final de la función para que el programa que llamó a la función no pierda sus datos.
+• Paso de información a funciones o subrutinas.
+• Para almacenar variables locales.
+• Para mantener el estado del procesador y registrar valores en el caso de excepciones como una interrupción.
 -------------------------------------------------------------------------------------------------------------
 11. Describa la secuencia de reset del microprocesador.
 -------------------------------------------------------------------------------------------------------------
@@ -100,10 +126,20 @@ Si esto es necesario, el procesador tiene que usar el mecanismo de excepción pa
 17. ¿Qué es el systick? ¿Por qué puede afirmarse que su implementación favorece la portabilidad de los sistemas operativos embebidos?
 -------------------------------------------------------------------------------------------------------------
 18. ¿Qué funciones cumple la unidad de protección de memoria (MPU)?
+La MPU puede ser usado para proteger regiones de memoria mediante la definición de permisos de accesos privilegiados y no privilegiados.
+
+Entres las funciones del MPU se pueden nombrar:
+- Evitar que las tareas de aplicación dañen la pila de memoria utilizadas por otra tareas y el kernel del SO.
+- Evitar que tarea sin privilegios accedan a ciertos periféricos que pueden ser criticos para la confiabilidad o seguridad del sistema.
+- Definición de SRAM o espacio de RAM como no ejecutable, evitando asi inyección de código.
 -------------------------------------------------------------------------------------------------------------
 19. ¿Cuántas regiones pueden configurarse como máximo?
 ¿Qué ocurre en caso de haber solapamientos de las regiones? 
 ¿Qué ocurre con las zonas de memoria no cubiertas por las regiones definidas?
+
+La MPU en los procesadores Cortex-M3 y Cortex-M4 puede admitir hasta ocho regiones de memoria programables, cada una con sus propias direcciones de inicio, tamaños y configuraciones programables.
+Si algun programa viola los permisos definidos por el MPU, o accede a una region que no esta definida en la regiones del MPU, el programa se bloquearía, disparando uan excepción de falla.
+
 -------------------------------------------------------------------------------------------------------------
 20. ¿Para qué se suele utilizar la excepción PendSV? ¿Cómo se relaciona su uso con el resto de las excepciones? Dé un ejemplo
 -------------------------------------------------------------------------------------------------------------
