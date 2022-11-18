@@ -64,6 +64,8 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 /* USER CODE BEGIN PFP */
 void zeros (uint32_t * vector, uint32_t longitud);
 void productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
+void productoEscalar16 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -395,6 +397,25 @@ void zeros (uint32_t * vector, uint32_t longitud){
 void productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar){
         for (uint32_t i = 0; i<longitud;i++){
         vectorOut[i]=escalar*vectorIn[i];
+    }
+}
+
+void productoEscalar16 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
+        for (uint32_t i = 0; i<longitud;i++){
+        vectorOut[i]=escalar*vectorIn[i];
+    }
+}
+
+void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
+        uint16_t producto;
+        for (uint32_t i = 0; i<longitud;i++){
+        producto=escalar*vectorIn[i];
+            if (producto > 4095){
+                vectorOut[i]=4095;
+            }
+            else {
+                vectorOut[i]=producto;
+            }
     }
 }
 /* USER CODE END 4 */

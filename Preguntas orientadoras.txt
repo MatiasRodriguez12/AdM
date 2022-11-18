@@ -116,6 +116,20 @@ Entre las principales funciones de la pila se encuentran:
 13. ¿Cómo se implementan las prioridades de las interrupciones? Dé un ejemplo
 -------------------------------------------------------------------------------------------------------------
 14. ¿Qué es el CMSIS? ¿Qué función cumple? ¿Quién lo provee? ¿Qué ventajas aporta?
+El CMSIS (Cortex microcontroller software interface standard) fue desarrollado por ARM.
+Es una capa de abstracción de hardware (independiente del proveedor) de la serie de procesadores Cortex-M. 
+CMSIS permite lograr una interfaz de software simple y consistente con el procesador y los periféricos, lo que simplifica la reutilización del software, 
+acorta el proceso de aprendizaje para los desarrolladores de microcontroladores novatos y acorta el tiempo de comercialización de nuevos dispositivos.
+
+Entre las ventajas que aporta se puede mencionar:
+
+- La principal ventaja es una mejor portabilidad y reutilización del software.
+- Es más fácil reutilizar código de software de proyectos anteriores.
+- Dado que todos los controladores de dispositivos compatibles con CMSIS tienen una estructura similar, aprender a usar un nuevo microcontrolador Cortex-M es mucho más fácil.
+- Cumple con la Asociación de Confiabilidad del Software de la Industria del Motor (MISRA). Por lo tanto, reduce el esfuerzo de validación requerido, ya que no es necesario desarrollar y probar sus propias funciones de acceso a funciones del procesador.
+- A partir de CMSIS 2.0, se incluye una biblioteca DSP que proporciona funciones DSP probadas y optimizadas. 
+- CMSIS es compatible con múltiples proveedores de cadenas de herramientas de compilación.
+- CMSIS ocupa poco espacio en la memoria (menos de 1 KB para todas las funciones de acceso principales y unos pocos bytes de RAM para varias variables).
 -------------------------------------------------------------------------------------------------------------
 15. Cuando ocurre una interrupción, asumiendo que está habilitada ¿Cómo opera el microprocesador para atender a la subrutina correspondiente? Explique con un ejemplo
 -------------------------------------------------------------------------------------------------------------
@@ -124,6 +138,9 @@ Entre las principales funciones de la pila se encuentran:
 16. Explique las características avanzadas de atención a interrupciones: tail chaining y late arrival.
 -------------------------------------------------------------------------------------------------------------
 17. ¿Qué es el systick? ¿Por qué puede afirmarse que su implementación favorece la portabilidad de los sistemas operativos embebidos?
+Se trata de un temporizador de 24 bits de cuenta descendente, que produce una
+interrupción cuando el registro interno llega a cero desde el valor de recarga inicial.
+Su implementación favorece a la portabilidad de sistemas operativos porque se lo considera un estandar entre los microcontroladores, haciendo que posean la misma base de tiempo.
 -------------------------------------------------------------------------------------------------------------
 18. ¿Qué funciones cumple la unidad de protección de memoria (MPU)?
 La MPU puede ser usado para proteger regiones de memoria mediante la definición de permisos de accesos privilegiados y no privilegiados.
