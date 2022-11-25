@@ -167,8 +167,19 @@ Si algun programa viola los permisos definidos por el MPU, o accede a una region
 ISA
 -------------------------------------------------------------------------------------------------------------
 1. ¿Qué son los sufijos y para qué se los utiliza? Dé un ejemplo
+Los sufijos son letras que acompañan a las instrucciones, permitiendo ejecutar alguna acción variante de la misma.
+
+Ejemplo:
+ldr: carga un valor en un registro.
+ldrb: si el valor a cargar es de 8 bits, completa los bits restantes con 0 (unsigned).
+ldrsb: si el valor a cargar es de 8 bits, completa los bits restantes con un valor igual al signo (signed, se genera la expansión del signo).
+
 -------------------------------------------------------------------------------------------------------------
 2. ¿Para qué se utiliza el sufijo ‘s’? Dé un ejemplo
+El sufijo "s" se utiliza para indicar que, una vez ejecutada la instrucción correspondiente, se debe actualiar los flags de estado.
+add r0, 1 ---> al valor del registro r0 le suma 1.
+adds r0, 1 ---> al valor del registro r0 le suma 1 y actualiza los flags de estado.
+
 -------------------------------------------------------------------------------------------------------------
 3. ¿Qué utilidad tiene la implementación de instrucciones de aritmética saturada? Dé un ejemplo con operaciones con datos de 8 bits.
 -------------------------------------------------------------------------------------------------------------

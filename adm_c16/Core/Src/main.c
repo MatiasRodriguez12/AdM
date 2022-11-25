@@ -66,6 +66,9 @@ void zeros (uint32_t * vector, uint32_t longitud);
 void productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
 void productoEscalar16 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
 void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+
+void asm_zeros (uint32_t * vector, uint32_t longitud);
+void asm_productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -158,6 +161,10 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
+  uint32_t vector_in[4] = { 4, 5, 0, 7 };
+  uint32_t vector_out[4] = {1,1,1,1};
+  //asm_zeros (vector_in, 4);
+  asm_productoEscalar32(vector_in,vector_out,4,3);
   PrivilegiosSVC ();
 
   const uint32_t Resultado = asm_sum (5, 3);
