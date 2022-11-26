@@ -155,8 +155,8 @@ Disassembly of section .text:
  800021a:	8804      	ldrh	r4, [r0, #0]
         mul r5,r4,r3		@cargo en r5 la multiplicacion entre r4 y r3
  800021c:	fb04 f503 	mul.w	r5, r4, r3
-        str r5,[r1]			@almaceno r5 en la direccion que esta apuntando r1
- 8000220:	600d      	str	r5, [r1, #0]
+        strh r5,[r1]			@almaceno r5 en la direccion que esta apuntando r1
+ 8000220:	800d      	strh	r5, [r1, #0]
         add r0, 2             @ Pasa a la siguiente palabra/elemento en vector.
  8000222:	f100 0002 	add.w	r0, r0, #2
         add r1, 2             @ Pasa a la siguiente palabra/elemento en vector.
@@ -604,6 +604,7 @@ int main(void)
  80005c6:	1d3b      	adds	r3, r7, #4
  80005c8:	e892 0003 	ldmia.w	r2, {r0, r1}
  80005cc:	e883 0003 	stmia.w	r3, {r0, r1}
+
   //asm_zeros (vector_in, 4);
   //asm_productoEscalar32(vector_in,vector_out,4,3);
   asm_productoEscalar16(vector16_in,vector16_out,4,7);
@@ -612,6 +613,7 @@ int main(void)
  80005d6:	2307      	movs	r3, #7
  80005d8:	2204      	movs	r2, #4
  80005da:	f7ff fe1e 	bl	800021a <asm_productoEscalar16>
+
   PrivilegiosSVC ();
  80005de:	f7ff ffa9 	bl	8000534 <PrivilegiosSVC>
 

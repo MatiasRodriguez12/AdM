@@ -166,9 +166,11 @@ int main(void)
   //uint32_t vector_out[4] = {1,1,1,1};
   uint16_t vector16_in[4] = {2, 0, 4, 5};
   uint16_t vector16_out[4] = {1,1,1,1};
+
   //asm_zeros (vector_in, 4);
   //asm_productoEscalar32(vector_in,vector_out,4,3);
   asm_productoEscalar16(vector16_in,vector16_out,4,7);
+
   PrivilegiosSVC ();
 
   const uint32_t Resultado = asm_sum (5, 3);

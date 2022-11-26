@@ -101,7 +101,7 @@
         asm_productoEscalar16_bucle:  	@ Etiqueta de comienzo de bucle.
         ldrh r4,[r0]			@cargo en r4 el valor de variable a la que esta apuntando r0
         mul r5,r4,r3		@cargo en r5 la multiplicacion entre r4 y r3
-        str r5,[r1]			@almaceno r5 en la direccion que esta apuntando r1
+        strh r5,[r1]			@almaceno r5 en la direccion que esta apuntando r1
         add r0, 2             @ Pasa a la siguiente palabra/elemento en vector.
         add r1, 2             @ Pasa a la siguiente palabra/elemento en vector.
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
