@@ -66,10 +66,6 @@ void zeros (uint32_t * vector, uint32_t longitud);
 void productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
 void productoEscalar16 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
 void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
-
-void asm_zeros (uint32_t * vector, uint32_t longitud);
-void asm_productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
-void asm_productoEscalar16 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -162,14 +158,24 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
+
+  //---------------------EJERCICIO 1---------------------
   //uint32_t vector_in[4] = { 4, 5, 0, 7 };
-  //uint32_t vector_out[4] = {1,1,1,1};
+  //asm_zeros (vector_in, 4);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 2---------------------
+  //uint32_t vector32_in[4] = { 4, 5, 0, 7 };
+  //uint32_t vector32_out[4] = {1,1,1,1};
+  //asm_productoEscalar32(vector32_in,vector32_out,4,3);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 3---------------------
   uint16_t vector16_in[4] = {2, 0, 4, 5};
   uint16_t vector16_out[4] = {1,1,1,1};
 
-  //asm_zeros (vector_in, 4);
-  //asm_productoEscalar32(vector_in,vector_out,4,3);
   asm_productoEscalar16(vector16_in,vector16_out,4,7);
+  //-----------------------------------------------------
 
   PrivilegiosSVC ();
 

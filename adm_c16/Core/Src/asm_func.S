@@ -74,17 +74,19 @@
 @	r1: dirección de memoria de inicio del vector de salida
 @   r2: longitud
 @   r3: escalar
-.thumb_func               @ Se avisa al emsablador que esta es una funcion
-    asm_productoEscalar32:            @ Etiqueta/nombre de la función.
-        asm_productoEscalar32_bucle:  	@ Etiqueta de comienzo de bucle.
-        ldr r4,[r0]			@cargo en r4 el valor de variable a la que esta apuntando r0
-        mul r5,r4,r3		@cargo en r5 la multiplicacion entre r4 y r3
-        str r5,[r1]			@almaceno r5 en la direccion que esta apuntando r1
-        add r0, 4             @ Pasa a la siguiente palabra/elemento en vector.
-        add r1, 4             @ Pasa a la siguiente palabra/elemento en vector.
+.thumb_func               					@ Se avisa al emsablador que esta es una funcion
+    asm_productoEscalar32:           		@ Etiqueta/nombre de la función.
+    push {r4-r5}							@ Almaceno en stack los valores previos de r4 y r5.
+        asm_productoEscalar32_bucle:  		@ Etiqueta de comienzo de bucle.
+        ldr r4,[r0]							@ Cargo en r4 el valor de variable a la que esta apuntando r0
+        mul r5,r4,r3						@ Cargo en r5 la multiplicacion entre r4 y r3
+        str r5,[r1]							@ Almaceno r5 en la direccion que esta apuntando r1
+        add r0, 4             				@ Pasa a la siguiente palabra/elemento en vector.
+        add r1, 4             				@ Pasa a la siguiente palabra/elemento en vector.
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
-    bne asm_productoEscalar32_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
-    bx lr                 				@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
+    	bne asm_productoEscalar32_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    pop {r4-r5}								@ Recupero del stack los valores previos de r4 y r5.
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
 
 
   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -96,15 +98,17 @@
 @	r1: dirección de memoria de inicio del vector de salida
 @   r2: longitud
 @   r3: escalar
-.thumb_func               @ Se avisa al emsablador que esta es una funcion
-    asm_productoEscalar16:            @ Etiqueta/nombre de la función.
-        asm_productoEscalar16_bucle:  	@ Etiqueta de comienzo de bucle.
-        ldrh r4,[r0]			@cargo en r4 el valor de variable a la que esta apuntando r0
-        mul r5,r4,r3		@cargo en r5 la multiplicacion entre r4 y r3
-        strh r5,[r1]			@almaceno r5 en la direccion que esta apuntando r1
-        add r0, 2             @ Pasa a la siguiente palabra/elemento en vector.
-        add r1, 2             @ Pasa a la siguiente palabra/elemento en vector.
+.thumb_func               					@ Se avisa al emsablador que esta es una funcion
+    asm_productoEscalar16:            		@ Etiqueta/nombre de la función.
+    push {r4-r5}							@ Almaceno en stack los valores previos de r4 y r5.
+        asm_productoEscalar16_bucle:  		@ Etiqueta de comienzo de bucle.
+        ldrh r4,[r0]						@ Cargo en r4 el valor de variable a la que esta apuntando r0
+        mul r5,r4,r3						@ Cargo en r5 la multiplicacion entre r4 y r3
+        strh r5,[r1]						@ Almaceno r5 en la direccion que esta apuntando r1
+        add r0, 2            				@ Pasa a la siguiente palabra/elemento en vector.
+        add r1, 2             				@ Pasa a la siguiente palabra/elemento en vector.
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
-    bne asm_productoEscalar16_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
-    bx lr                 				@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
+    	bne asm_productoEscalar16_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    pop {r4-r5}								@ Recupero del stack los valores previos de r4 y r5.
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
 
