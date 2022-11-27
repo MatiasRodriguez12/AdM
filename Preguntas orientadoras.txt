@@ -185,5 +185,11 @@ adds r0, 1 ---> al valor del registro r0 le suma 1 y actualiza los flags de esta
 -------------------------------------------------------------------------------------------------------------
 4. Describa brevemente la interfaz entre assembler y C ¿Cómo se reciben los argumentos de las funciones? 
 ¿Cómo se devuelve el resultado? ¿Qué registros deben guardarse en la pila antes de ser modificados?
+
+Los argumentos de la funciones son cargados en los registros que van desde R0 a R3.
+En caso de que la funcion deba devolver algun resultado, el mismo es devuelto a traves del registro R0.
+Los registros superiores a R3 pueden ser empleados en la ejecucion de instrucciones, pero pueden estar cargados previamente con otros parametros importantes que no deben ser eliminados.
+Para usarlos, se debe almacenar el valor de los registros en el stack a traves de la instruccion PUSH.
+Una vez terminada la ejecucion de instrucciones de la funcion, los parametros originales deben ser devueltos a sus registros correspondientes a traves de la instruccion POP.
 -------------------------------------------------------------------------------------------------------------
 5. ¿Qué es una instrucción SIMD? ¿En qué se aplican y que ventajas reporta su uso? Dé un ejemplo.
