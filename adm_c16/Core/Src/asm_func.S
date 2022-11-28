@@ -8,6 +8,7 @@
 .global asm_zeros
 .global asm_productoEscalar32
 .global asm_productoEscalar16
+.global asm_productoEscalar12
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -112,3 +113,24 @@
     pop {r4-r5}								@ Recupero del stack los valores previos de r4 y r5.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
 
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void asm_productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
+@
+@ Parametros recibidos:
+@   r0: dirección de memoria de inicio del vector de entrada
+@	r1: dirección de memoria de inicio del vector de salida
+@   r2: longitud
+@   r3: escalar
+.thumb_func               					@ Se avisa al emsablador que esta es una funcion
+    asm_productoEscalar12:            		@ Etiqueta/nombre de la función.
+    push {r4}								@ Almaceno en stack el valor previo de r4.
+        asm_productoEscalar12_bucle:  		@ Etiqueta de comienzo de bucle.
+        ldrh r4,[r0],#2						@ Cargo en r4 el valor de variable a la que esta apuntando r0 y apunto al elemeno siguiente (r0 + 2 bytes)
+        mul r4,r3							@ Cargo en r4 la multiplicacion entre r4 y r3
+        usat r4,12,r4						@ Saturo r4 a 12 bits (unsigned)
+        strh r4,[r1],#2						@ Almaceno r4 en la direccion que esta apuntando r1 y apunto al elemeno siguiente (r1 + 2 bytes)
+        subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
+    	bne asm_productoEscalar12_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    pop {r4}								@ Recupero del stack los valores previos de r4.
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.

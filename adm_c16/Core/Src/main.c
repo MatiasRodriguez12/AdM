@@ -171,10 +171,17 @@ int main(void)
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 3---------------------
-  uint16_t vector16_in[4] = {2, 0, 4, 5};
+  //uint16_t vector16_in[4] = {2, 0, 4, 5};
+  //uint16_t vector16_out[4] = {1,1,1,1};
+
+  //asm_productoEscalar16(vector16_in,vector16_out,4,7);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 4---------------------
+  uint16_t vector16_in[4] = {2046,2047,2048,2049};
   uint16_t vector16_out[4] = {1,1,1,1};
 
-  asm_productoEscalar16(vector16_in,vector16_out,4,7);
+  asm_productoEscalar12(vector16_in,vector16_out,4,2);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
