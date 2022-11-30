@@ -66,6 +66,7 @@ void zeros (uint32_t * vector, uint32_t longitud);
 void productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
 void productoEscalar16 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
 void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -178,10 +179,17 @@ int main(void)
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 4---------------------
-  uint16_t vector16_in[4] = {2046,2047,2048,2049};
-  uint16_t vector16_out[4] = {1,1,1,1};
+  //uint16_t vector16_in[4] = {2046,2047,2048,2049};
+  //uint16_t vector16_out[4] = {1,1,1,1};
 
-  asm_productoEscalar12(vector16_in,vector16_out,4,2);
+  //asm_productoEscalar12(vector16_in,vector16_out,4,2);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 6---------------------
+  int32_t vector32_in[4] = {1000,-7,1048576,-4194304};
+  int16_t vector16_out[4] = {1,1,1,1};
+
+  pack32to16 (&vector32_in, &vector16_out, 4);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
@@ -443,6 +451,17 @@ void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t long
                 vectorOut[i]=producto;
             }
     }
+}
+
+void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud){
+	for (uint32_t i = 0; i<longitud;i++){
+		if (vectorIn[i]<65536 && vectorIn[i]>-65536){
+			vectorOut[i]=vectorIn[i];
+		}
+		else {
+			vectorOut[i]=(vectorIn[i]>>16);
+		}
+	}
 }
 /* USER CODE END 4 */
 
