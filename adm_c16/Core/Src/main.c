@@ -187,17 +187,17 @@ int main(void)
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 6---------------------
-  //int32_t vector32_in[4] = {1000,-7,1048576,-4194304};
-  //int16_t vector16_out[4] = {1,1,1,1};
+  int32_t vector32_in[8] = {1000,-7,32767,-32767,32768,-32768,4000000,-4000000};
+  int16_t vector16_out[8] = {1,1,1,1,1,1,1,1};
 
-  //pack32to16 (vector32_in, vector16_out, 4);
+  asm_pack32to16 (vector32_in, vector16_out, 8);
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 7---------------------
-  int32_t vector32_in[4] = {4,-7,10,-22};
-  int32_t posicion;
+  //int32_t vector32_in[4] = {4,-7,10,-22};
+  //int32_t posicion;
 
-  posicion = max (vector32_in, 4);
+  //posicion = max (vector32_in, 4);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
@@ -463,7 +463,7 @@ void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t long
 
 void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud){
 	for (uint32_t i = 0; i<longitud;i++){
-		if (vectorIn[i]<65536 && vectorIn[i]>-65536){
+		if (vectorIn[i]<32768 && vectorIn[i]>-32768){
 			vectorOut[i]=vectorIn[i];
 		}
 		else {
