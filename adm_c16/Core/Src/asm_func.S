@@ -10,7 +10,7 @@
 .global asm_productoEscalar16
 .global asm_productoEscalar12
 .global asm_pack32to16
-
+.global asm_max
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
@@ -169,4 +169,36 @@
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
     	bne asm_pack32to16_bucle		   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
     pop {r4-r5}								@ Recupero del stack los valores previos de r4.
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
+
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   int32_t max (int32_t * vectorIn, uint32_t longitud)
+@
+@ Parametros recibidos:
+@   r0: dirección de memoria de inicio del vector de entrada
+@	r1: longitud
+
+.thumb_func               					@ Se avisa al emsablador que esta es una funcion
+    asm_max:        			    		@ Etiqueta/nombre de la función.
+    push {r4-r6}							@ Almaceno en stack el valor previo de r4 a r6.
+    ldr r2,[r0]								@ Almaceno un valor inicial en r2
+    ldr r3,=0								@ Almaceno un indice inicial en r3
+    mov r4,r1								@ Almaceno longitud del vector
+    mov r5,r1								@ Variable que me indica el indice actual del vector durante el bucle
+        asm_max_bucle:  					@ Etiqueta de comienzo de bucle.
+        	sub r5,r4,r1					@ Almaceno en r5 la diferencia entre r4 y r1 (obtengo indice actual)
+       		ldr r6,[r0],#4					@ Cargo en r6 el elemento actual del vector de entrada
+        	cmp r6,r2						@ Comparo r6 con r2
+        	bgt asm_max_update				@ Si el elemento actual es mayor, salto al bucle de actualización
+        b end_bucle							@ Su el elemento actual es menor, salto al bucle general
+        	asm_max_update:
+       		mov r3,r5						@ Actualizo el indice donde se encuentra el elemento mayor temporal
+        	mov r2,r6						@ Actualizo el valor del elemento mayor temporal
+        b end_bucle
+        end_bucle:
+        subs r1, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
+    	bne asm_max_bucle				   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    mov r0,r3
+    pop {r4-r6}								@ Recupero del stack los valores previos de r4 a r6.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
