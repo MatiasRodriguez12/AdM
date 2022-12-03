@@ -66,6 +66,7 @@ void zeros (uint32_t * vector, uint32_t longitud);
 void productoEscalar32 (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
 void productoEscalar16 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
 void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void filtroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn);
 void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud);
 int32_t max (int32_t * vectorIn, uint32_t longitud);
 /* USER CODE END PFP */
@@ -186,18 +187,25 @@ int main(void)
   //asm_productoEscalar12(vector16_in,vector16_out,4,2);
   //-----------------------------------------------------
 
-  //---------------------EJERCICIO 6---------------------
-  //int32_t vector32_in[8] = {1000,-7,32767,-32767,32768,-32768,4000000,-4000000};
-  //int16_t vector16_out[8] = {1,1,1,1,1,1,1,1};
+  //---------------------EJERCICIO 5---------------------
+  //uint16_t vector16_in[10] = {2,4,6,7,8,9,10,11,12,15};
+  //uint16_t vector16_out[10] = {1,1,1,1,1,1,1,1,1,1};
 
-  //asm_pack32to16 (vector32_in, vector16_out, 8);
+  //filtroVentana10(vector16_in, vector16_out, 10);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 6---------------------
+  int32_t vector32_in[8] = {1000,-7,65535,-65535,65536,-65536,4000000,-4000000};
+  int16_t vector16_out[8] = {1,1,1,1,1,1,1,1};
+
+  asm_pack32to16 (vector32_in, vector16_out, 8);
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 7---------------------
-  int32_t vector32_in[4] = {4,-7,10,22};
-  int32_t posicion;
+  //int32_t vector32_in[4] = {4,-7,10,22};
+  //int32_t posicion;
 
-  posicion = asm_max (vector32_in, 4);
+  //posicion = asm_max (vector32_in, 4);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
@@ -461,14 +469,34 @@ void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t long
     }
 }
 
+void filtroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
+	int32_t ind_max=0;
+	int32_t ind_min=0;
+	uint32_t suma;
+	uint32_t cantidad=0;
+
+	for (uint32_t i=0;i<longitudVectorIn;i++){
+		suma=0;
+		cantidad=0;
+		ind_max=i+2;
+		if (ind_max>=longitudVectorIn){
+			ind_max=longitudVectorIn-1;
+		}
+		ind_min=i-2;
+		if (ind_min<0){
+			ind_min=0;
+		}
+		for (uint32_t j=ind_min;j<=ind_max;j++){
+			cantidad++;
+			suma=suma+vectorIn[j];
+		}
+		vectorOut[i]=suma/cantidad;
+	}
+}
+
 void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud){
 	for (uint32_t i = 0; i<longitud;i++){
-		if (vectorIn[i]<32768 && vectorIn[i]>-32768){
-			vectorOut[i]=vectorIn[i];
-		}
-		else {
-			vectorOut[i]=(vectorIn[i]>>16);
-		}
+	vectorOut[i]=(vectorIn[i]>>16);
 	}
 }
 

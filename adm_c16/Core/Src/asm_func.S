@@ -11,6 +11,7 @@
 .global asm_productoEscalar12
 .global asm_pack32to16
 .global asm_max
+.global asm_filtroVentana10
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
@@ -146,29 +147,12 @@
 @   r2: longitud
 .thumb_func               					@ Se avisa al emsablador que esta es una funcion
     asm_pack32to16:            				@ Etiqueta/nombre de la función.
-    push {r4-r5}								@ Almaceno en stack el valor previo de r4.
-    ldr r4,=32768
-    ldr r5,=-32768
         asm_pack32to16_bucle:  				@ Etiqueta de comienzo de bucle.
         ldr r3,[r0],#4						@ Cargo en r3 el valor de variable a la que esta apuntando r0 y apunto al elemeno siguiente (r0 + 4 bytes)
-        cmp r3,r4							@ Comparo r3 y r4
-        blt asm_cond1						@ si r3 es menor a r4, salto a asm_cond1
-        b	asm_pack						@ si r3 es mayor a r4, salto a asm_pack
-        	asm_cond1:
-        	cmp r3,r5						@ Comparo r3 y r5
-        	bgt asm_cond2					@ Si r3 es mayor a r5, salto a asm_cond2
-       		b	asm_pack					@ si r3 es menor a r5, salto a asm_pack
-        		asm_cond2:					@ r3 se encuentra dentro del rango 32768 y -32768.
-       			 strh r3,[r1],#2			@ Almaceno r3 en la direccion a la que apunta r1 y paso al siguiente elemento.
-        		 b	asm_out_bucle			@ Salto al bucle principal.
-        	asm_pack:						@ r3 se encuentra fuera del rango 32768 y -32768
-        	lsr r3,16						@ Desplazo el contenido de r3 16 lugares a la derecha.
-        	strh r3,[r1],#2					@ Almaceno r3 en la direccion a la que apunta r1 y paso al siguiente elemento.
-       	 	b asm_out_bucle					@ Salto al bucle principal.
-        asm_out_bucle:
+        lsr r3,16							@ Desplazo el contenido de r3 16 lugares a la derecha.
+        strh r3,[r1],#2						@ Almaceno r3 en la direccion a la que apunta r1 y paso al siguiente elemento.
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
     	bne asm_pack32to16_bucle		   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
-    pop {r4-r5}								@ Recupero del stack los valores previos de r4.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
 
  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -201,4 +185,26 @@
     	bne asm_max_bucle				   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
     mov r0,r3
     pop {r4-r6}								@ Recupero del stack los valores previos de r4 a r6.
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
+
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void asm_filtroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn)
+@
+@ Parametros recibidos:
+@   r0: dirección de memoria de inicio del vector de entrada
+@	r1: dirección de memoria de inicio del vector de salida
+@   r2: longitud
+
+.thumb_func               					@ Se avisa al emsablador que esta es una funcion
+    asm_filtroVentana10:            		@ Etiqueta/nombre de la función.
+    push {r4}								@ Almaceno en stack el valor previo de r4.
+        asm_filtroVentana10_bucle:  		@ Etiqueta de comienzo de bucle.
+        ldrh r4,[r0],#2						@ Cargo en r4 el valor de variable a la que esta apuntando r0 y apunto al elemeno siguiente (r0 + 2 bytes)
+        mul r4,r3							@ Cargo en r4 la multiplicacion entre r4 y r3
+        usat r4,12,r4						@ Saturo r4 a 12 bits (unsigned)
+        strh r4,[r1],#2						@ Almaceno r4 en la direccion que esta apuntando r1 y apunto al elemeno siguiente (r1 + 2 bytes)
+        subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
+    	bne asm_filtroVentana10_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    pop {r4}								@ Recupero del stack los valores previos de r4.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
