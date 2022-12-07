@@ -92,6 +92,11 @@ Si esto es necesario, el procesador tiene que usar el mecanismo de excepción pa
 Se refiere a que los registros pueden almacenar cualquier tipos de datos, ya sean valores de variables, instrucciones, punteros, etc.
 -------------------------------------------------------------------------------------------------------------
 8. ¿Qué ventajas presenta el uso de intrucciones de ejecución condicional (IT)? Dé un ejemplo
+
+Las instrucciones condicionales IT se utilizan para poder codificar pequeñas ramificaciones en assembler (IF THEN).
+Cuando en el proceso del programa se genera un salto condicional ocurre que se pueden perder ciclos de reloj en el pipeline de ejecución.
+Las instrucciones IT podrian describir ramificaciones evitando la perdida de ciclos de reloj.
+Se pueden escribir hasta 4 sentencias condicionales.
 -------------------------------------------------------------------------------------------------------------
 9. Describa brevemente las excepciones más prioritarias (reset, NMI, Hardfault).
 -------------------------------------------------------------------------------------------------------------
@@ -193,3 +198,9 @@ Para usarlos, se debe almacenar el valor de los registros en el stack a traves d
 Una vez terminada la ejecucion de instrucciones de la funcion, los parametros originales deben ser devueltos a sus registros correspondientes a traves de la instruccion POP.
 -------------------------------------------------------------------------------------------------------------
 5. ¿Qué es una instrucción SIMD? ¿En qué se aplican y que ventajas reporta su uso? Dé un ejemplo.
+
+SIMD viene de “Single Instruction Multiple Data”. Es una instrucción que procesa múltiples datos en una única operación.
+Se aplica en los casos en donde los valores de los registros son tratados como valores de 8 o 16 bits.
+La principal ventaja es que permite realizar multiples operaciones en menos ciclos de reloj.
+Para ello, divide el registro de 32 bits en 2 partes (si los elemenos fueran de 16 bits) o 4 partes (si los elementos fueran de 8 bits), y los considera independientes uno de otros.
+Esto permite que se puedan ejecutar operaciones en forma paralela en una sola instrucción.
