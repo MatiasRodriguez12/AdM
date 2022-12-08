@@ -12,6 +12,7 @@
 .global asm_pack32to16
 .global asm_max
 .global asm_filtroVentana10
+.global asm_downsampleM
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
@@ -206,4 +207,31 @@
 .thumb_func               					@ Se avisa al emsablador que esta es una funcion
     asm_filtroVentana10:            		@ Etiqueta/nombre de la función.
 
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
+
+   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void asm_downsampleM (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+@
+@ Parametros recibidos:
+@   r0: dirección de memoria de inicio del vector de entrada
+@	r1: dirección de memoria de inicio del vector de salida
+@   r2: longitud
+@   r3: indicacion de cada cuantas muestras se debe eliminar
+.thumb_func               					@ Se avisa al emsablador que esta es una funcion
+    asm_downsampleM:            		@ Etiqueta/nombre de la función.
+    push {r4-r6}								@ Almaceno en stack el valor previo de r4.
+    mov r4,#1
+    mov r6,0
+        asm_downsampleM_bucle:  		@ Etiqueta de comienzo de bucle.
+        ldr r5,[r0],#4
+        cmp r4,r3
+        ittee lt
+        strlt r5,[r1],#4
+        addlt r4,#1
+        strge r6,[r1],#4
+        movge r4,#1
+        subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
+    	bne asm_downsampleM_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    pop {r4-r6}								@ Recupero del stack los valores previos de r4.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.

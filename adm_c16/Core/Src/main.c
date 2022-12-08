@@ -69,6 +69,8 @@ void productoEscalar12 (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t long
 void filtroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn);
 void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud);
 int32_t max (int32_t * vectorIn, uint32_t longitud);
+void downsampleM (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -206,6 +208,13 @@ int main(void)
   //int32_t posicion;
 
   //posicion = asm_max (vector32_in, 4);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 8---------------------
+  int32_t vector32_in[8] = {1,2,3,4,5,6,7,8};
+  int32_t vector32_out[8] = {1,1,1,1,1,1,1,1};
+
+  asm_downsampleM (vector32_in, vector32_out,8,3);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
@@ -511,6 +520,22 @@ int32_t max (int32_t * vectorIn, uint32_t longitud){
 		}
 	}
 	return indice;
+}
+
+void downsampleM (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
+	int32_t indice=1;
+
+	for (uint32_t i=0;i<longitud;i++){
+
+		if(indice < N){
+			vectorOut[i]=vectorIn[i];
+			indice++;
+		}
+		else{
+			vectorOut[i]=0;
+			indice=1;
+		}
+	}
 }
 
 /* USER CODE END 4 */
