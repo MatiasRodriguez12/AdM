@@ -176,16 +176,12 @@
         	sub r5,r4,r1					@ Almaceno en r5 la diferencia entre r4 y r1 (obtengo indice actual)
        		ldr r6,[r0],#4					@ Cargo en r6 el elemento actual del vector de entrada
         	cmp r6,r2						@ Comparo r6 con r2
-        	bgt asm_max_update				@ Si el elemento actual es mayor, salto al bucle de actualización
-        b end_bucle							@ Su el elemento actual es menor, salto al bucle general
-        	asm_max_update:
-       		mov r3,r5						@ Actualizo el indice donde se encuentra el elemento mayor temporal
-        	mov r2,r6						@ Actualizo el valor del elemento mayor temporal
-        b end_bucle
-        end_bucle:
+        	itt gt							@ Ejecucion condicional si r6>r2
+        	movgt r3,r5						@ si r6>r2, actualizo el indice donde se encuentra el elemento mayor temporal
+        	movgt r2,r6						@ si r6>r2, actualizo el valor del elemento mayor temporal
         subs r1, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
     	bne asm_max_bucle				   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
-    mov r0,r3
+    mov r0,r3								@ Para poder devolver el indice, cargo r3 en r0.
     pop {r4-r6}								@ Recupero del stack los valores previos de r4 a r6.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
 
