@@ -218,19 +218,22 @@
 @	r1: dirección de memoria de inicio del vector de salida
 @   r2: longitud
 @   r3: indicacion de cada cuantas muestras se debe eliminar
+@	r4: indice para controlar cantidad de elementos recorridos hasta el momento
+@	r5: Valor que contiene la dirección a la que apunta r0
+@	r6: registro que contiene un valor de 0
 .thumb_func               					@ Se avisa al emsablador que esta es una funcion
-    asm_downsampleM:            		@ Etiqueta/nombre de la función.
-    push {r4-r6}								@ Almaceno en stack el valor previo de r4.
-    mov r4,#1
-    mov r6,0
-        asm_downsampleM_bucle:  		@ Etiqueta de comienzo de bucle.
-        ldr r5,[r0],#4
-        cmp r4,r3
-        ittee lt
-        strlt r5,[r1],#4
-        addlt r4,#1
-        strge r6,[r1],#4
-        movge r4,#1
+    asm_downsampleM:            			@ Etiqueta/nombre de la función.
+    push {r4-r6}							@ Almaceno en stack los valores previos de r4-r6.
+    mov r4,#1								@ Inicializo el indice en 1
+    mov r6,0								@ Cargo en r6 un valor igual a 0
+        asm_downsampleM_bucle:  			@ Etiqueta de comienzo de bucle.
+        ldr r5,[r0],#4						@ Cargo en r5 el contenido de la dirección a la que apunta r1.
+        cmp r4,r3							@ Comparo indice r4 con r3.
+        ittee lt							@ Defino condicional
+        strlt r5,[r1],#4					@ Si r4<r3, cargo el valor del elemento del vector de entrada en su correspondiente elemento del vector de salida.
+        addlt r4,#1							@ Si r4<r3, incremento en 1 el indice r4
+        strge r6,[r1],#4					@ Si r4>=r3, cargo 0 en el elemento que corresponde al vector de salida
+        movge r4,#1							@ Si r4>=r3, inicializo el indice en 1 nuevamente
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
     	bne asm_downsampleM_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
     pop {r4-r6}								@ Recupero del stack los valores previos de r4.
