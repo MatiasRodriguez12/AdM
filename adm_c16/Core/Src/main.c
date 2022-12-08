@@ -70,6 +70,7 @@ void filtroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitu
 void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud);
 int32_t max (int32_t * vectorIn, uint32_t longitud);
 void downsampleM (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+void invertir (uint16_t * vector, uint32_t longitud);
 
 /* USER CODE END PFP */
 
@@ -211,10 +212,16 @@ int main(void)
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 8---------------------
-  int32_t vector32_in[8] = {1,2,3,4,5,6,7,8};
-  int32_t vector32_out[8] = {1,1,1,1,1,1,1,1};
+  //int32_t vector32_in[8] = {1,2,3,4,5,6,7,8};
+  //int32_t vector32_out[8] = {1,1,1,1,1,1,1,1};
 
-  asm_downsampleM (vector32_in, vector32_out,8,3);
+  //asm_downsampleM (vector32_in, vector32_out,8,3);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 9---------------------
+  uint16_t vector32_in[5] = {1,2,3,4,5};
+
+  asm_invertir (vector32_in, 5);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
@@ -535,6 +542,21 @@ void downsampleM (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, ui
 			vectorOut[i]=0;
 			indice=1;
 		}
+	}
+}
+
+void invertir (uint16_t * vector, uint32_t longitud){
+	uint16_t aux_in=0;
+	uint16_t aux_out=0;
+	uint32_t j=longitud/2;
+	uint32_t indice;
+
+	for (uint32_t i=0;i<j;i++){
+		indice=longitud-1-i;
+		aux_in=vector[indice];
+		aux_out=vector[i];
+		vector[i]=aux_in;
+		vector[indice]=aux_out;
 	}
 }
 

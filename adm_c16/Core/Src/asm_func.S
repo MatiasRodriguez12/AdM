@@ -13,6 +13,7 @@
 .global asm_max
 .global asm_filtroVentana10
 .global asm_downsampleM
+.global asm_invertir
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
@@ -237,4 +238,39 @@
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
     	bne asm_downsampleM_bucle   	@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
     pop {r4-r6}								@ Recupero del stack los valores previos de r4.
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
+
+       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void asm_invertir (uint16_t * vector, uint32_t longitud);
+@
+@ Parametros recibidos:
+@   r0: dirección de memoria de inicio del vector de entrada
+@	r1: longitud
+@	r2: indice para conocer la mitad del vector
+@	r3: contenido del elemento i del vector.
+@	r4:	indice auxiliar para determinar la direccion correspondiente al elemento i a invertir
+@	r5:	direccion correspondiente al elemento i a invertir
+@	r6: contenido del elemento a invertir con el elemento i
+@	r7: contiene la direccion r0 de manera constante
+.thumb_func               				@ Se avisa al emsablador que esta es una funcion
+    asm_invertir:            			@ Etiqueta/nombre de la función.
+    push {r4-r7}						@ Almaceno en stack los valores previos de r4-r7.
+    mov r2,#2							@ Inicializo r2 con un valor igual a 2
+    udiv r2,r1,r2						@ Divido la longitud entre 2 y lo almaceno en r2 (indice de mitad de vector)
+    sub	r1,#1							@ Resto 1 a la longitud, obtengo indice maximo del vector
+    mov r5,r0							@ Inicializo r5 con un valor igual a r0
+    mov r7,r0							@ Inicializo r5 con un valor igual a r0. r5 se mantendra constante
+        asm_invertir_bucle:  				@ Etiqueta de comienzo de bucle.
+        ldrh r3,[r0]						@ Cargo en r5 el contenido de la dirección a la que apunta r1.
+        mov	r4,2							@ Inicializo r4 con un valor igual a 2
+ 		mul	r4,r1,r4						@ Multiplico r1 por 2 y almaceno en r4. Obtengo cuantos elementos debo sumar a r0 para obtener la direccion de su elemento correspondiente a invertir
+		sub r1,1							@ Resto 1 a r1.
+		add	r5,r4,r7						@ Obtengo la direccion del elemento a invertir el elemento i
+		ldrh r6,[r5]						@ Obtengo el contenido del elemento a invertir con el elemento i
+		strh r3,[r5]						@ Cargo en el elemento i el contenido correspondiente
+		strh r6,[r0],#2						@ Mandl el contenido i a su nuevo lugar
+        subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
+    	bne asm_invertir_bucle   			@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    pop {r4-r7}								@ Recupero del stack los valores previos de r4-r7.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
