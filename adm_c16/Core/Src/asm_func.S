@@ -200,10 +200,49 @@
 @   r7: indice actual para bucle
 @	r8: longitud (fijo)
 @	r9: indice para segundo bucle
+@	r10: direccion del primer elemento para bucle suma
+@	r11: indice auxiliar para obtener direccion de primer elemento de bucle suma
+@	r12: carga temporal de los valores para sumar
 
 .thumb_func               					@ Se avisa al emsablador que esta es una funcion
-    asm_filtroVentana10:            		@ Etiqueta/nombre de la función.
 
+    asm_filtroVentana10:            		@ Etiqueta/nombre de la función.
+    	push {r4-r12}						@ Almaceno en stack el valor previo de r4 a r12
+		mov r8,r2							@ Almaceno longitud de manera constante
+		mov r9,r0							@ Almaceno direccion del elemento 0 de manera constante
+
+		asm_filtroVentana10_bucle:
+		sub r7,r8,r2						@ Obtengo indice actual del bucle
+
+		add r3,r7,5							@ Obtengo indice maximo
+		cmp r3,r8							@ Comparo indice maximo con longitud
+		itt ge
+		movge r3,r8							@ Si indice maximo es mayor a la longitud, cargo longitud-1 como indice maximo
+		subge r3,1
+
+		mov r11,2							@ Inicializo r11 con un valor de 2
+		mov r10,r9							@ Inicializo r10 con la direccion del elemento 0 del vector de entrada
+		sub r4,r7,5 						@ Obtengo indice minimo
+		cmp r4,0
+		itee le
+		movle r4,0							@ Si indice minimo me da negativo, lo igualo a 0 (direccion inicial es igual a la del elemento 0)
+		mulgt r11,r4,r11					@ Si es mayor a 0, multiplico el valor del indice minimo por 2
+		addgt r10,r11						@ Sumo el resultado anterior a r10. Obtengo direccion donde deberia iniciar a recorrer el bucle
+
+			mov r5,0						@ Inicializo r5 a 0
+			mov r6,0						@ Inicializo r6 a 0
+			suma_bucle:						@ Inicia bucle para calcular la suma de los elemenos de la ventana
+			ldrh r12,[r10],#2				@ Cargo en r12 el valor del indice actual del bucle
+			add r5,r12						@ R5 se encarga de ir acumulando la suma de los elementos de la ventana
+			add r6,1						@ R6 se encarga de ir contando cuantos elementos tiene la ventana
+			add r4,1						@ Incremento r4 en una unidad
+			cmp r4,r3						@ Si r4 es igual a R5, quiere decir que ya se recorrieron todos los elementos de la ventana
+			ble suma_bucle
+		udiv r5,r6							@ Divido la suma acumulada con la cantidad de elementos de la ventana
+		strh r5,[r1],#2						@ Almaceno el promedio en el vector de salida e incremento en 2 la direccion de salida
+        subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
+    	bne asm_filtroVentana10_bucle		@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+	pop {r4-r12}							@ Recupero del stack los valores previos de r4 a r12.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
 
    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
