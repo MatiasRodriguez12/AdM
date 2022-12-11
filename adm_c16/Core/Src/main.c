@@ -71,6 +71,8 @@ void pack32to16 (int32_t * vectorIn, int16_t * vectorOut, uint32_t longitud);
 int32_t max (int32_t * vectorIn, uint32_t longitud);
 void downsampleM (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
 void invertir (uint16_t * vector, uint32_t longitud);
+void audioEco (int16_t * vectorIn,int16_t * vectorOut,uint32_t longitud);
+void inicializarVector (int16_t * vector);
 
 /* USER CODE END PFP */
 
@@ -191,10 +193,10 @@ int main(void)
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 5---------------------
-  uint16_t vector16_in[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-  uint16_t vector16_out[20] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  //uint16_t vector16_in[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+  //uint16_t vector16_out[20] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 
-  asm_filtroVentana10(vector16_in, vector16_out, 20);
+  //asm_filtroVentana10(vector16_in, vector16_out, 20);
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 6---------------------
@@ -222,6 +224,16 @@ int main(void)
  // uint16_t vector32_in[5] = {1,2,3,4,5};
 
   //asm_invertir (vector32_in, 5);
+  //-----------------------------------------------------
+
+  //---------------------EJERCICIO 10---------------------
+  int16_t vector_in[4096] = {};
+  int16_t vector_out[4096] = {};
+
+  inicializarVector(vector_in);
+
+  //asm_audioEco (vector_in,vector_out,4096);
+  audioEco (vector_in,vector_out,4096);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
@@ -560,6 +572,28 @@ void invertir (uint16_t * vector, uint32_t longitud){
 	}
 }
 
+void audioEco (int16_t * vectorIn,int16_t * vectorOut,uint32_t longitud){
+	int16_t j=0;
+
+	for (int16_t i=0; i<longitud;i++){
+		if(i<882){
+			vectorOut[i]=vectorIn[i];
+		}
+		else{
+			j=i-882;
+			vectorOut[i]=vectorIn[i]+vectorIn[j]/2;
+		}
+	}
+
+}
+
+void inicializarVector (int16_t * vector){
+
+	for (int16_t i=0; i<4096;i++){
+			vector[i]=(i+1)*2;
+		}
+
+}
 /* USER CODE END 4 */
 
 /**

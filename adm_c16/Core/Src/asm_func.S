@@ -14,6 +14,7 @@
 .global asm_filtroVentana10
 .global asm_downsampleM
 .global asm_invertir
+.global asm_audioEco
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
@@ -307,5 +308,47 @@
 		strh r6,[r0],#2						@ Mandl el contenido i a su nuevo lugar
         subs r2, 1           				@ Resta 1 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
     	bne asm_invertir_bucle   			@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
+    pop {r4-r7}								@ Recupero del stack los valores previos de r4-r7.
+    bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
+
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void asm_audioEco (int16_t * vectorIn,int16_t * vectorOut,uint32_t longitud)
+@
+@ Parametros recibidos:
+@   r0: dirección de memoria de inicio del vector de entrada
+@	r1: dirección de memoria de inicio del vector de entrada
+@	r2: longitud
+@	r3: Indice para primer bucle (dejar pasar valores sin eco)
+@	r4: Contendio de la direccion a la que apunta r0.
+@	r5: Direccion donde se debe obtener el eco.
+@	r6: Contenido de r5 (eco a agregar).
+@	r7: Registro con contenido 0 (usado para producir division por 2 en SIMD).
+
+.thumb_func               				@ Se avisa al emsablador que esta es una funcion
+    asm_audioEco:            			@ Etiqueta/nombre de la función.
+    push {r4-r7}						@ Almaceno en stack los valores previos de r4-r7.
+    mov r3,#442							@ Inicializo r3 con un valor igual a 442 (882/2+1).
+  	mov r7,0							@ Inicializo r7 con 0 (usado para instruccion SIMD shadd16).
+	mov r5,r0							@ Inicializo r5 con un valor igual a r0.
+	add r2,2							@ Adiciono 2 unidades a r2 (para recorrer el vector completamente)
+        asm_audioEco_delay_bucle:  				@ Etiqueta de comienzo de bucle.
+        sub r3,1						@ Resto 1 unidad a r3 por cada iteracion de bucle
+        sub r2,2						@ Resto 2 unidades a r2 por cada iteracion de bucle
+        ldr r4,[r0],#4					@ Cargo en r4 el contenido al que apunta r0, y sumo 4 bytes.
+        cmp r3,0						@ Comparo r3 con 0. Se genera condicional itt
+        itt gt
+        strgt r4,[r1],#4				@ Si r3>0, almaceno el contenido de r4 en la direccion a la que apunta r1, y sumo 4 bytes
+        bgt asm_audioEco_delay_bucle	@ Si r3>0, retorno al bucle asm_audioEco_delay_bucle
+	sub r0,4								@ Resto 4 bytes a r0 para no perder elementos
+    asm_bucle_eco:							@ Etiqueta de comienzo de bucle.
+    ldr r4,[r0],#4						@ Cargo en r4 el contenido al que apunta r0, y sumo 4 bytes.
+    ldr r6,[r5],#4						@ Cargo en r6 el contenido al que apunta r1 (eco), y sumo 4 bytes.
+    shadd16	r6,r6,r7					@ Sumo r6 un valor a 0 y divido por 2 (SIMD)
+    sadd16	r4,r4,r6					@ Sumo registros r4 y r6 (SIMD) y almaceno en r4
+    str r4,[r1],#4						@ Almaceno r4 en la direccion a la que apunta r1, y sumo 4 bytes
+
+    subs r2, 2           				@ Resta 2 a la cantidad de elementos y actualiza flags de estado del procesador. En particular, estamos interesados en el flag Z.
+    bne asm_bucle_eco   			@ La instrucción se ejecuta mientras el resultado de r2 - 1 no sea cero (Z == 0).
     pop {r4-r7}								@ Recupero del stack los valores previos de r4-r7.
     bx lr                 					@ La instrucción de salto no se ejecutó porque Z == 1, volvemos a quién nos llamó.
