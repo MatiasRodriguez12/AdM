@@ -99,6 +99,11 @@ Las instrucciones IT podrian describir ramificaciones evitando la perdida de cic
 Se pueden escribir hasta 4 sentencias condicionales.
 -------------------------------------------------------------------------------------------------------------
 9. Describa brevemente las excepciones más prioritarias (reset, NMI, Hardfault).
+
+Las exceocuibes de Reset, NMI y Hardfault son excepciones que no son configurables, siendo las mas prioritarias de todas.
+La excepción Reset posee la mayor prioridad a las demas. Se encarga de generar el reinicio del microprocesador de manera instantanea, deteniendo cualquier ejecución que se esté llevando a cabo.
+NMI son interrupciones no enmascarables. Estas suelen ser disparadas por watchdogs o detectores de brownout.
+El HardFault es una excepción que se produce debido a fallos de sistema. 
 -------------------------------------------------------------------------------------------------------------
 10. Describa las funciones principales de la pila. ¿Cómo resuelve la arquitectura el llamado a funciones y su retorno?
 
@@ -115,10 +120,33 @@ Entre las principales funciones de la pila se encuentran:
 • Para mantener el estado del procesador y registrar valores en el caso de excepciones como una interrupción.
 -------------------------------------------------------------------------------------------------------------
 11. Describa la secuencia de reset del microprocesador.
+En los microcontroladores Cortex -M típicos puede haber tres tipos de reinicio:
+• Reinicio de encendido: reinicia todo en el microcontrolador. Esto incluye el procesador y su componente de soporte de depuración y periféricos.
+• Restablecimiento del sistema: restablece solo el procesador y los periféricos, pero no el componente de soporte de depuración del procesador.
+• Restablecimiento del procesador: solo restablece el procesador.
+
+Después del reinicio y antes de que el procesador comience a ejecutar el programa, los procesadores Cortex-M leen las dos primeras palabras de la memoria.
+El comienzo del espacio de memoria contiene la tabla de vectores, y las dos primeras palabras en la tabla de vectores son el valor inicial para el puntero de pila principal (MSP) y el vector de reinicio, 
+que es la dirección inicial del controlador de reinicio. Después de que el procesador lea estas dos palabras, el procesador configura el MSP y el contador de programa (PC) con estos valores.
 -------------------------------------------------------------------------------------------------------------
 12. ¿Qué entiende por “core peripherals”? ¿Qué diferencia existe entre estos y el resto de los periféricos?
+Son perifericos que impactan directamente en el comportamiento de la arquitectura.
+Algunos de ellos son:
+
+- NVIC (Nested Vector Interrupt Controller).
+- SysTick timer.
+- MPU (Memory Protection Unit) en M0+, M3, M4 y M7.
+- Banco de registros (Register Bank).
+
+La diferencia con otros periféricos es que estos corresponden a los periféricos del procesador, mientras que el resto corresponde de manera genérica a los periféricos de los microcontroladores 
+(UART, I2C, SPI, GPIO, etc).
 -------------------------------------------------------------------------------------------------------------
 13. ¿Cómo se implementan las prioridades de las interrupciones? Dé un ejemplo
+
+El diseño de los procesadores Cortex-M3 y Cortex-M4 admite tres niveles fijos de prioridad más alta y hasta 256 niveles de prioridad programable (con un máximo de 128 niveles de preferencia).
+La asignación de las prioridades sirven para reducir el tiempo de respuesta de la aplicación. Por ejemplo, periféricos que son críticos pueden tener asignado interrupciones con alta prioridad, 
+entonces si la interrupción se dispara cuando el procesador está atendiendo otra interrupción de menor prioridad, dicha interrupción de menor prioridad es suspendida, permitiendo a la interrupción de mayor prioridad ser atendida inmediatamente.
+La configuración de estas prioridades se logra programando el NVIC, activando la interrupción y asignandole un nivel de prioridad. 
 -------------------------------------------------------------------------------------------------------------
 14. ¿Qué es el CMSIS? ¿Qué función cumple? ¿Quién lo provee? ¿Qué ventajas aporta?
 El CMSIS (Cortex microcontroller software interface standard) fue desarrollado por ARM.
@@ -137,10 +165,23 @@ Entre las ventajas que aporta se puede mencionar:
 - CMSIS ocupa poco espacio en la memoria (menos de 1 KB para todas las funciones de acceso principales y unos pocos bytes de RAM para varias variables).
 -------------------------------------------------------------------------------------------------------------
 15. Cuando ocurre una interrupción, asumiendo que está habilitada ¿Cómo opera el microprocesador para atender a la subrutina correspondiente? Explique con un ejemplo
+Para gestionar una petición de interrupción la CPUdebe detener el ciclo de instrucción. Cada vez que una instrucción es completada, la propia CPU va a comprobar si existe una petición de interrupción. 
+En el caso de que no exista ejecutará la siguiente línea de código del programa. Si existe lo que hará será almacenar el estado del programa en un registro especial. Siendo el estado el valor de la siguiente instrucción en el contador de programa. 
+Dependiendo del cual sea el tipo de instrucción, la CPU cargará en el contador de programa una dirección de memoria especial que apunta a la ROM de instrucciones, un programa en una memoria aparte del procesador que tiene codificado como la CPU tiene que gestionar dicha instrucción.
 -------------------------------------------------------------------------------------------------------------
 17. ¿Cómo cambia la operación de stacking al utilizar la unidad de punto flotante? 
 -------------------------------------------------------------------------------------------------------------
 16. Explique las características avanzadas de atención a interrupciones: tail chaining y late arrival.
+
+Tail chaining
+Cuando ocurre una excepción pero el procesador está manejando otra excepción de la misma o mayor prioridad, la excepción entrará en estado pendiente.
+Cuando el procesador termina de ejecutar el controlador de excepciones actual, puede proceder a procesar la solicitud de excepción/interrupción pendiente. 
+En lugar de restaurar los registros de la pila (desapilar) y luego empujarlos de nuevo a la pila (apilar), el procesador omite los pasos de desapilar y apilar e ingresa al controlador de excepción de la excepción pendiente tan pronto como sea posible. 
+De esta manera, la brecha de tiempo entre los dos manejadores de excepciones se reduce considerablemente.
+
+Late arrival
+Cuando se produce una excepción, el procesador acepta la solicitud de excepción e inicia la operación de apilamiento. 
+Si durante esta operación de apilamiento se produce otra excepción de mayor prioridad, se atenderá primero la excepción de llegada tardía de mayor prioridad.
 -------------------------------------------------------------------------------------------------------------
 17. ¿Qué es el systick? ¿Por qué puede afirmarse que su implementación favorece la portabilidad de los sistemas operativos embebidos?
 Se trata de un temporizador de 24 bits de cuenta descendente, que produce una
@@ -187,6 +228,8 @@ adds r0, 1 ---> al valor del registro r0 le suma 1 y actualiza los flags de esta
 
 -------------------------------------------------------------------------------------------------------------
 3. ¿Qué utilidad tiene la implementación de instrucciones de aritmética saturada? Dé un ejemplo con operaciones con datos de 8 bits.
+Las instrucciones de aritmética saturada previenen la distorsión de los resultados de las operaciones ariméticas por desbordamiento (overflow). 
+De esta manera, el resultado de una instrucción de aritmética saturada que supere el límite de la precisión en bits utilizada no desbordará, sino que quedará fijo con el valor máximo.
 -------------------------------------------------------------------------------------------------------------
 4. Describa brevemente la interfaz entre assembler y C ¿Cómo se reciben los argumentos de las funciones? 
 ¿Cómo se devuelve el resultado? ¿Qué registros deben guardarse en la pila antes de ser modificados?
