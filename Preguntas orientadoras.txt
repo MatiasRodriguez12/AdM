@@ -170,6 +170,14 @@ En el caso de que no exista ejecutará la siguiente línea de código del progra
 Dependiendo del cual sea el tipo de instrucción, la CPU cargará en el contador de programa una dirección de memoria especial que apunta a la ROM de instrucciones, un programa en una memoria aparte del procesador que tiene codificado como la CPU tiene que gestionar dicha instrucción.
 -------------------------------------------------------------------------------------------------------------
 17. ¿Cómo cambia la operación de stacking al utilizar la unidad de punto flotante? 
+
+Si la unidad de punto flotante está disponible y habilitada, y si se ha utilizado, los registros en el banco de registros de la unidad de punto flotante contendrán datos que podrían necesitar ser guardados. 
+Para reducir la latencia de interrupción, el procesador Cortex-M4 tiene una característica llamada apilamiento diferido(lazy stacking). 
+Cuando llega una excepción con la unidad de coma flotante habilitada y utilizada, se utiliza el formato de trama de pila más largo. Sin embargo, los valores de estos registros de punto flotante no se escriben realmente en el marco de la pila.
+Cuando ocurre el apilamiento diferido, se establece un registro interno llamado LSPACT (Lazy Stacking Preservation Active) y otro registro de 32 bits llamado Floating Point Context Address Register (FPCAR) almacena la dirección del espacio de pila reservado para el registro de punto flotante.
+Si el controlador de excepciones no requiere ninguna operación de punto flotante, los registros de punto flotante permanecen sin cambios durante la operación del controlador de excepciones y no se restauran al salir de la excepción.
+Si el controlador de excepciones necesita operaciones de coma flotante, el procesador detecta el conflicto y detiene el procesador, empuja los registros de coma flotante al espacio de pila reservado y borra LSPACT. Después de eso, se reanuda el controlador de excepciones. 
+De esta forma, los registros de punto flotante se apilan solo si son necesarios.
 -------------------------------------------------------------------------------------------------------------
 16. Explique las características avanzadas de atención a interrupciones: tail chaining y late arrival.
 
@@ -205,8 +213,17 @@ Si algun programa viola los permisos definidos por el MPU, o accede a una region
 
 -------------------------------------------------------------------------------------------------------------
 20. ¿Para qué se suele utilizar la excepción PendSV? ¿Cómo se relaciona su uso con el resto de las excepciones? Dé un ejemplo
+
+La excepción PendSV se utiliza para retrasar la solicitud de cambio de contexto hasta que todos los demás controladores de IRQ hayan completado su procesamiento. 
+Para hacer esto, el PendSV se programa como la excepción de prioridad más baja. Si el sistema operativo decide que se necesita un cambio de contexto, 
+establece el estado pendiente de PendSV y lleva a cabo el cambio de contexto dentro de la excepción de PendSV.
 -------------------------------------------------------------------------------------------------------------
 21. ¿Para qué se suele utilizar la excepción SVC? Expliquelo dentro de un marco de un sistema operativo embebido
+
+La instrucción SuperVisor Call (SVC) se utiliza para generar la excepción SVC (tipo de excepción 11). 
+Por lo general, SVC se usa con un sistema operativo integrado/sistema operativo en tiempo real (RTOS), 
+donde una tarea de aplicación que se ejecuta en un estado de ejecución sin privilegios puede solicitar servicios del sistema operativo, 
+que se ejecuta en el estado de ejecución privilegiado. El mecanismo de excepción de SVC proporciona la transición de no privilegiado a privilegiado.
 -------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------

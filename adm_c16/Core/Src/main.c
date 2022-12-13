@@ -50,6 +50,8 @@ ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptor
 UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
+uint8_t ch[6]="2";
+uint8_t espacio[]="\n\r";
 
 /* USER CODE BEGIN PV */
 
@@ -157,6 +159,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  DWT->CTRL |= 1 << DWT_CTRL_CYCCNTENA_Pos;
 
   /* USER CODE END SysInit */
 
@@ -189,14 +192,34 @@ int main(void)
   //uint16_t vector16_in[4] = {2046,2047,2048,2049};
   //uint16_t vector16_out[4] = {1,1,1,1};
 
+  //DWT->CYCCNT = 0;
   //asm_productoEscalar12(vector16_in,vector16_out,4,2);
+  //const volatile uint32_t Ciclos = DWT->CYCCNT;
+  //sprintf((char*) ch, "%d",(int) Ciclos);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 5, HAL_MAX_DELAY);
+
+  //DWT->CYCCNT = 0;
+  //productoEscalar12(vector16_in,vector16_out,4,2);
+  //uint32_t Ciclos2 = DWT->CYCCNT;
+  //sprintf((char*) ch, "%d",(int) Ciclos2);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 5, HAL_MAX_DELAY);
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 5---------------------
-  //uint16_t vector16_in[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-  //uint16_t vector16_out[20] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  /*uint16_t vector16_in[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+  uint16_t vector16_out[20] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 
-  //asm_filtroVentana10(vector16_in, vector16_out, 20);
+  DWT->CYCCNT = 0;
+  asm_filtroVentana10(vector16_in, vector16_out, 20);
+  const volatile uint32_t Ciclos = DWT->CYCCNT;
+  sprintf((char*) ch, "%d",(int) Ciclos);
+  HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 6, HAL_MAX_DELAY);
+
+  DWT->CYCCNT = 0;
+  filtroVentana10(vector16_in, vector16_out, 20);
+  const volatile uint32_t Ciclos2 = DWT->CYCCNT;
+  sprintf((char*) ch, "%d",(int) Ciclos2);
+  HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 6, HAL_MAX_DELAY);*/
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 6---------------------
@@ -211,6 +234,11 @@ int main(void)
   //int32_t posicion;
 
   //posicion = asm_max (vector32_in, 4);
+  //sprintf((char*) ch, "%d",(int) posicion);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 5, HAL_MAX_DELAY);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&espacio, 3, HAL_MAX_DELAY);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 5, HAL_MAX_DELAY);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&espacio, 3, HAL_MAX_DELAY);
   //-----------------------------------------------------
 
   //---------------------EJERCICIO 8---------------------
@@ -232,8 +260,17 @@ int main(void)
 
   inicializarVector(vector_in);
 
-  //asm_audioEco (vector_in,vector_out,4096);
+  DWT->CYCCNT = 0;
+  asm_audioEco (vector_in,vector_out,4096);
+  const volatile uint32_t Ciclos3 = DWT->CYCCNT;
+  //sprintf((char*) ch, "%d",(int) Ciclos3);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 6, HAL_MAX_DELAY);
+
+  DWT->CYCCNT = 0;
   audioEco (vector_in,vector_out,4096);
+  const volatile uint32_t Ciclos4 = DWT->CYCCNT;
+  //sprintf((char*) ch, "%d",(int) Ciclos4);
+  //HAL_UART_Transmit (&huart3, (uint8_t *)&ch, 6, HAL_MAX_DELAY);
   //-----------------------------------------------------
 
   PrivilegiosSVC ();
